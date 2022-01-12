@@ -1,22 +1,34 @@
 package main;
 
+import java.awt.*;
+
 public class Tile {
-    //private player player
+    private Player player = null;
     private boolean alive = false;
-//    private final int x;
-//    private final int y;
-//
-//    public Tile(int x, int y) {
-//        this.x = x;
-//        this.y = y;
-//    }
+
+    public Tile() { }
 
     public void setAlive(boolean alive) {
+        if(!alive) player = null;
         this.alive = alive;
     }
 
     public boolean isAlive() {
         return alive;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+        player.incrementCells();
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public Color getColor() {
+        if(!alive) return Color.DARK_GRAY;
+        return player.getColor();
     }
 
     @Override
