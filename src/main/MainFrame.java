@@ -3,6 +3,7 @@ package main;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 
 public class MainFrame extends JFrame {
     private static MainFrame instance = null;
@@ -13,6 +14,7 @@ public class MainFrame extends JFrame {
     private final JLabel lblBlue = new JLabel();
     private final JLabel lblRed = new JLabel();
     private boolean killState = true;
+    private final MinimaxBot minimaxBot = new MinimaxBot();
 
     public static MainFrame getInstance() {
         if (instance == null) instance = new MainFrame();
@@ -61,10 +63,14 @@ public class MainFrame extends JFrame {
                     game.setAliveAt(finalI, finalJ, !killState);
                     killState = !killState;
                     if (killState) {
-                        game.switchPlayer();
                         game.cycle();
+                        game.switchPlayer();
+                        minimaxBot.playTurn(game);
                     }
                     update();
+                    if(game.isOver()) {
+                        gameOver();
+                    }
                 });
                 gridPanel.add(btn);
                 v.add(btn);
@@ -75,20 +81,40 @@ public class MainFrame extends JFrame {
         mainPanel.add(gridPanel, BorderLayout.CENTER);
     }
 
-    private void update() {
-        lblBlue.setText(game.getBluePlayer().toString());
-        lblRed.setText(game.getRedPlayer().toString());
+    private void gameOver() {
+        String winner = game.winner() != null ? game.winner().toString() : "no one!";
+        JOptionPane.showMessageDialog(this, "Game over. Winner is " + winner);
+    }
+
+    public void update() {
+        lblBlue.setText("[" + game.getBlueCells() + "]");
+        lblRed.setText("[" + game.getRedCells() + "]");
         updateGridPanel();
 
     }
 
-    public void updateGridPanel() {
+    private void updateGridPanel() {
         for (int i = 0; i < game.getHeight(); i++) {
             for (int j = 0; j < game.getWidth(); j++) {
-                boolean enabled = game.getTileAt(i, j).isAlive() == killState;
-                buttonGrid.elementAt(i).elementAt(j).setEnabled(enabled);
-                buttonGrid.elementAt(i).elementAt(j).setBackground(game.getTileAt(i, j).getColor());
+                updateTile(i, j);
             }
         }
+    }
+
+    public void sleep() {
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateTile(int i, int j) {
+        boolean enabled = false;
+        Tile tile = game.getTileAt(i, j);
+        if(tile.isAlive() && killState && tile.getPlayer() != game.getCurrentPlayer()) enabled = true;
+        else if(!tile.isAlive() && !killState) enabled = true;
+        buttonGrid.elementAt(i).elementAt(j).setEnabled(enabled);
+        buttonGrid.elementAt(i).elementAt(j).setBackground(game.getTileAt(i, j).getColor());
     }
 }
