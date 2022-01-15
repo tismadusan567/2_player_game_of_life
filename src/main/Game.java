@@ -1,8 +1,6 @@
 package main;
 
-import javax.swing.text.BadLocationException;
 import java.util.Vector;
-import java.util.concurrent.TimeUnit;
 
 public class Game {
     private final int width;

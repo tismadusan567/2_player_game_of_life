@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MainFrame extends JFrame {
     private static MainFrame instance = null;
-    private final Game game = new Game();
+    private Game game = new Game();
     private final JPanel mainPanel = new JPanel(new BorderLayout());
     private final JPanel gridPanel = new JPanel(new GridLayout(game.getHeight(), game.getWidth()));
     private final Vector<Vector<JButton>> buttonGrid = new Vector<>();
@@ -83,7 +83,7 @@ public class MainFrame extends JFrame {
 
     private void gameOver() {
         String winner = game.winner() != null ? game.winner().toString() : "no one!";
-        JOptionPane.showMessageDialog(this, "Game over. Winner is " + winner);
+        new GameOverDialog(winner);
     }
 
     public void update() {
@@ -116,5 +116,10 @@ public class MainFrame extends JFrame {
         else if(!tile.isAlive() && !killState) enabled = true;
         buttonGrid.elementAt(i).elementAt(j).setEnabled(enabled);
         buttonGrid.elementAt(i).elementAt(j).setBackground(game.getTileAt(i, j).getColor());
+    }
+
+    public void restartGame() {
+        game = new Game();
+        update();
     }
 }
